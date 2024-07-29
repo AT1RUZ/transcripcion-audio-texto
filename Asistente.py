@@ -1,16 +1,11 @@
 import json
 import base64
 import os.path
-import  time
+import time
 import requests
-from pydub import AudioSegment
 from fpdf import FPDF
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import inch
 
 class Asistente():
-
 
     def __init__(self):
         self.transcripcion = None
@@ -19,11 +14,9 @@ class Asistente():
         self.idioma = None
         self.tamaño_segmento = 30000
         self.archivo = None
-        #Atributo temporal
+        # Atributo temporal
         self.i = 0
         self.transcrito = False
-
-
 
     def divide_audio(self, audio_a_separar, segment_length_ms):
         audio = audio_a_separar
@@ -46,28 +39,29 @@ class Asistente():
 
     def exportar_transcripcion_txt(self):
         if self.transcripcion is not None:
-            with open("tt.txt", "w",encoding="utf-8") as file:
+            with open("tt.txt", "w", encoding="utf-8") as file:
                 file.write(self.transcripcion)
             if os.path.exists("temp_segment.mp3"):
                 os.remove("temp_segment.mp3")
-        else: return None
+        else:
+            return None
 
     def exportar_transcripcion_pdf(self):
         if self.transcripcion is not None:
             pdf = FPDF()
             pdf.add_page()
-            pdf.set_font("Arial",size=12)
-            pdf.cell(200,10,txt="Transcripcion", ln=1,align="C")
-            pdf.multi_cell(200, 7, self.transcripcion, 0,0,'C')
+            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 10, txt="Transcripcion", ln=1, align="C")
+            pdf.multi_cell(200, 7, self.transcripcion, 0, 0, 'C')
             pdf.output("tt.pdf")
             if os.path.exists("temp_segment.mp3"):
                 os.remove("temp_segment.mp3")
-        else: return None
-
+        else:
+            return None
 
     def transcribe_segment(self, segment, api_token, idioma, api_url):
         print("EJECUTANDO TRANSCRIBE SERVERS PARA EL SEGMENTO " + str(self.i + 1))
-        inicio  =  time.time()
+        inicio = time.time()
         self.i += 1
 
         segment.export("temp_segment.mp3", format="mp3")
@@ -90,9 +84,8 @@ class Asistente():
         intentos = 3
         intento = 0
 
-        while intentos  > 0:
-            
-            
+        while intentos > 0:
+
             print("Intento " + str(intento + 1))
             intento += 1
             print("Conectando...")
@@ -112,7 +105,3 @@ class Asistente():
                 print("reintentando")
         if intentos == 0:
             return None
-
-
-
-
