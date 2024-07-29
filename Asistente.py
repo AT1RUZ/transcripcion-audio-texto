@@ -5,7 +5,8 @@ import time
 import requests
 from fpdf import FPDF
 
-class Asistente():
+
+class Asistente:
 
     def __init__(self):
         self.transcripcion = None

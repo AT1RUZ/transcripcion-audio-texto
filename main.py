@@ -17,7 +17,7 @@ if not st.session_state.transcrito:
     idioma = st.selectbox("Seleccione el idioma del texto", (" ", "Español", "Ingles"))
     procesar = False
     if idioma != " ":
-        archivo = st.file_uploader("Elige un archivo", ("mp3"))
+        archivo = st.file_uploader("Elige un archivo", "mp3")
 
         if st.session_state.permiso_procesar:
             procesar = st.button("Procesar")
