@@ -13,7 +13,7 @@ class Asistente:
         self.url = "https://api-inference.huggingface.co/models/openai/whisper-large"
         self.token = "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"
         self.idioma = None
-        self.tamaño_segmento = 30000
+        self.tamaño_segmento = 60000
         self.archivo = None
         # Atributo temporal
         self.i = 0
