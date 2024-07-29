@@ -4,6 +4,10 @@ import os.path
 import  time
 import requests
 from pydub import AudioSegment
+from fpdf import FPDF
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
 
 class Asistente():
 
@@ -17,6 +21,7 @@ class Asistente():
         self.archivo = None
         #Atributo temporal
         self.i = 0
+        self.transcrito = False
 
 
 
@@ -36,17 +41,32 @@ class Asistente():
                 self.transcripcion += transcripcion_temp + ""
             else:
                 return False
+        self.transcrito = True
         return True
 
-    def exportar_transcripcion(self):
-        with open("candela.txt", "w",encoding="utf-8") as file:
-            file.write(self.transcripcion)
-        if os.path.exists("temp_segment.mp3"):
-            os.remove("temp_segment.mp3")
+    def exportar_transcripcion_txt(self):
+        if self.transcripcion is not None:
+            with open("tt.txt", "w",encoding="utf-8") as file:
+                file.write(self.transcripcion)
+            if os.path.exists("temp_segment.mp3"):
+                os.remove("temp_segment.mp3")
+        else: return None
+
+    def exportar_transcripcion_pdf(self):
+        if self.transcripcion is not None:
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial",size=12)
+            pdf.cell(200,10,txt="Transcripcion", ln=1,align="C")
+            pdf.multi_cell(200, 7, self.transcripcion, 0,0,'C')
+            pdf.output("tt.pdf")
+            if os.path.exists("temp_segment.mp3"):
+                os.remove("temp_segment.mp3")
+        else: return None
 
 
     def transcribe_segment(self, segment, api_token, idioma, api_url):
-        print("EJECUTANDO TRANSCRIBE SERVERS PARA EL SEGMENTO " + str(self.i))
+        print("EJECUTANDO TRANSCRIBE SERVERS PARA EL SEGMENTO " + str(self.i + 1))
         inicio  =  time.time()
         self.i += 1
 
@@ -68,8 +88,13 @@ class Asistente():
             }
         })
         intentos = 3
+        intento = 0
 
-        while True and intentos  > 1:
+        while intentos  > 0:
+            
+            
+            print("Intento " + str(intento + 1))
+            intento += 1
             print("Conectando...")
             # Realizar la solicitud a la API
             response = requests.post(api_url, headers=headers, data=data)
@@ -83,11 +108,10 @@ class Asistente():
                 return transcription
             else:
                 intentos -= 1
-                if intentos == 0:
-                    return None
                 print(f"Error {response.status_code}: {response.text}")
                 print("reintentando")
-
+        if intentos == 0:
+            return None
 
 
 
